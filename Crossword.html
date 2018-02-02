@@ -1,0 +1,138 @@
+<!-- 9*9 Crossword Grid-->
+
+<!doctype html>
+<html>
+ <head>
+     <!--Head section -->
+     <meta title="CrossWord Grid">
+     <meta charset="utf-8">
+    <style>
+    div {
+        border:1px solid black;
+        width:20px;
+        height:20px;
+        float:left;
+        background:#fff;
+        color:#000;
+        margin:0 -1px -1px 0;
+        }
+    button{display:inline-block;}    
+    .clear { clear:both }
+    .black {background:#000;color:#fff;}
+    .white {background:#fff;color:#000;}
+    </style>
+     
+ </head>
+ <body onload="generate();">
+        
+     <section>
+        <button type ="button"  id="ValidateCrossword">ValidateCrossWord</button>
+        <button type ="button"  id="GenerateCrossword">GenerateCrossWord</button>
+     </section>
+        <br>  
+ </body>
+</html>
+    
+<script>
+    
+//generate function will get executed once body element in html loads,this function will hold the ValidateCrossWord button onclick function-draw  .   
+function generate(){
+
+     var generateCrossWord = document.getElementById("GenerateCrossword");// variable generateCrossWord will hold the html element(ValidateCrossWord button) with Id = GenerateCrossword. 
+
+     // below code will get triggered when user clicks on ValidateCrossWord button and calls our function draw to plot the CrossWordgrid   
+     generateCrossWord.onclick =function ()
+     {
+         draw();
+     }
+ }
+function draw()
+ {
+
+     var classNames = ["white", "black"]; //array variable to hold the two css classes.This is used to provide white and black colors to each cells.
+     
+     var cellCount = 1;// cellcount is used to provide cell number for each divs.This value is later used to toggle the colour when user clicks.
+     
+     //To plot Crossgrid we are using an outer loop and inner. Outer loop will plot columns and inner loop will plot rows.
+     for(var i=0; i<9; i++)
+     {
+        for(var j=0; j<9;j++)
+        {   
+        var square = document.createElement("div");// this will create a div element with respective css styles mentioned in style section.
+     if (j===0){ // adding style clear:both will plot the element to next line since we are using float left for each divs.
+        
+        square.className = "clear ";
+        }
+     if( i % 2 !=0)//i denotes columns, this if condition finds all the odd columns and assigns class names(white or black) alternatively.We are also seeting an attribute to this div with value of that individual cell count.eg 56th div will have an attribute "cellvalue = 56"
+         {
+             square.className += (j%2 ==0)?classNames[0]:classNames[1];
+             square.setAttribute("CellValue",cellCount);
+         }
+      else//for all the even columns we assign white class
+      {
+          square.className += classNames[0];
+          square.setAttribute("CellValue",cellCount);
+      }        
+
+     document.body.appendChild(square);// the generated div is appended to body tag.
+            cellCount++;//the cell count is incremented after each loop to get next cell value
+     }
+     }
+    var validateCrossWord = document.getElementById("ValidateCrossword");//this valriable will hold the ValidateCrossword button element.
+    var checkBoxes = document.getElementsByTagName('div');// this varibale will hold all the divs plotted for crossgrid.
+    for(var i = 0; i < checkBoxes.length; i++) {// for loop is used to assign click functions to all the cells .
+    var checkBox = checkBoxes[i];
+    checkBox.onclick = function() {//a click on any cell will trigger this function and following code will get executed.
+        var cellCount = this.getAttribute("cellvalue").trim();//this variable will hold the respective clicked cell value.
+
+        if(this.classList.contains("white"))// condition to check if the existing color is white, if true below code will toggle the color of the cell and also its symmetric diagonal equivalent tile in the crossword.
+            {
+                this.classList.remove("white");
+                this.classList.add("black");
+                checkBoxes[checkBoxes.length - cellCount].classList.remove("white");
+                checkBoxes[checkBoxes.length - cellCount].classList.add("black");
+            }
+        else if (this.classList.contains("black"))// similar condition to check if its black
+            {
+                this.classList.remove("black");
+                this.classList.add("white");
+                checkBoxes[checkBoxes.length - cellCount].classList.remove("black");
+                checkBoxes[checkBoxes.length - cellCount].classList.add("white");
+            }
+
+    }
+}
+   validateCrossWord.onclick = function()// this function will get triggerd when user clicks on Validate Crossword button.
+   {
+       
+       var blackCells = document.getElementsByClassName("black");//to find the number of black tiles.
+       if(blackCells.length < 21 || blackCells.length > 29)// condition pop an alert box to show below message.
+           {
+               alert("The number of black cells(16) should be between 21 and 29");
+           }
+       var valcellCount = 0;// variable to count number of black cells in a row
+       for(var rowCount = 0;rowCount < 9; rowCount++)// outer loop to check the count in each row
+           {
+       for(var i=rowCount; i < blackCells.length;i++)//inner loop to find the number of black tiles in each row
+           {
+               var blackCellValue = blackCells[i].getAttribute("cellvalue")-1; // blackcell value to decremented one to make it easy for finding modulus of 9.
+               if((blackCellValue%9) == rowCount)// this condition will find modulus of each cell and check if it is equal to the rowcount.eg if rowcount is 0 and cell value is 9, we can conclude the black cell is from row 1.inside the condition we will increment the counter .
+                   {
+                       valcellCount++;
+
+                   }
+               i+9;
+           }
+               if(valcellCount == 0 || valcellCount >5)// the counter value is checked to show alert message.
+                   {
+                       alert("The number of black cells per row should be between 0 and 5.Please adjust row"+(rowCount+1));
+
+                   }
+               valcellCount =0;//counter value is reset to 0.
+           }
+
+
+   }  
+ }
+         
+</script>
